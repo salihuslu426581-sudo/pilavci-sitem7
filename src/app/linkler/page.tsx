@@ -14,7 +14,7 @@ export default function LinksPage() {
       
       <div className={styles.content}>
         <div className={styles.logoContainer}>
-          <h1 className={styles.title}>Pilavcı</h1>
+          <h1 className={styles.title}>Pilav7'm</h1>
           <p className={styles.subtitle}>Bize Ulaşın & Sosyal Medya</p>
         </div>
 
