@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { menuItems as initialMenuItems } from '@/data/menu';
 
@@ -28,3 +29,4 @@ export async function DELETE() {
   global.globalMenu = initialMenuItems;
   return NextResponse.json({ success: true });
 }
+

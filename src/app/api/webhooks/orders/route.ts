@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 
 // In-memory queue for incoming external orders
@@ -51,3 +52,4 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ success: false }, { status: 400 });
   }
 }
+
