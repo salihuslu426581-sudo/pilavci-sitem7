@@ -56,6 +56,8 @@ export default function AdminDashboard() {
   const [newProductCategory, setNewProductCategory] = useState(categories[0].id);
   const [newProductIngredients, setNewProductIngredients] = useState('');
   const [newProductImage, setNewProductImage] = useState('');
+  const [newProductCalories, setNewProductCalories] = useState('');
+  const [newProductWeight, setNewProductWeight] = useState('');
 
   // Global AudioContext referansı (Limit aşımını önlemek için)
   const audioCtxRef = useRef<any>(null);
@@ -321,7 +323,8 @@ export default function AdminDashboard() {
       id: 'item-' + Date.now(),
       name: newProductName,
       price: Number(newProductPrice),
-      calories: 250, // default
+      calories: newProductCalories ? Number(newProductCalories) : 250,
+      weight: newProductWeight || undefined,
       ingredients: newProductIngredients,
       categoryId: newProductCategory,
       image: newProductImage || undefined
@@ -334,6 +337,8 @@ export default function AdminDashboard() {
     setNewProductPrice('');
     setNewProductIngredients('');
     setNewProductImage('');
+    setNewProductCalories('');
+    setNewProductWeight('');
   };
 
   useEffect(() => {
@@ -681,6 +686,24 @@ export default function AdminDashboard() {
                   value={newProductIngredients} 
                   onChange={e => setNewProductIngredients(e.target.value)} 
                   placeholder="İçindekiler (İsteğe bağlı)" 
+                  className="bg-dark border border-gray rounded" 
+                  style={{ padding: '0.75rem', color: '#fff', fontSize: '1rem' }}
+                />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-sm">
+                <input 
+                  type="number" 
+                  value={newProductCalories} 
+                  onChange={e => setNewProductCalories(e.target.value)} 
+                  placeholder="Kalori (örn: 350)" 
+                  className="bg-dark border border-gray rounded" 
+                  style={{ padding: '0.75rem', color: '#fff', fontSize: '1rem' }}
+                />
+                <input 
+                  type="text" 
+                  value={newProductWeight} 
+                  onChange={e => setNewProductWeight(e.target.value)} 
+                  placeholder="Gram/ML (örn: 350 Gr Veya 330 ML)" 
                   className="bg-dark border border-gray rounded" 
                   style={{ padding: '0.75rem', color: '#fff', fontSize: '1rem' }}
                 />
