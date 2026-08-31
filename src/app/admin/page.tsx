@@ -126,48 +126,10 @@ export default function AdminDashboard() {
           audio.volume = 1.0;
           audio.play().catch(e => console.log(e));
         } else {
-          // Masa için asla engellenmeyen, tarayıcının kendi ürettiği pırıl pırıl bir Otel Zili (Çın-Çın-Çın!)
-          if (!audioCtxRef.current) {
-            audioCtxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
-          }
-          const ctx = audioCtxRef.current;
-          if (ctx.state === 'suspended') ctx.resume();
-          
-          const playDing = (startTime: number) => {
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            
-            osc.type = 'triangle'; // Zile en çok benzeyen dalga
-            osc.frequency.setValueAtTime(1046.50, startTime); // C6 notası (Parlak ve net)
-            
-            osc.connect(gain);
-            gain.connect(ctx.destination);
-            
-            // Kısık kaldığı için sesi arttırdık (0.35). 3 kere üst üste binince yaklaşık 1.0 seviyesine gelir (Patlamaz ama gür çıkar).
-            gain.gain.setValueAtTime(0.35, startTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.3); // Hızlı sönümleme
-            
-            osc.start(startTime);
-            osc.stop(startTime + 0.3);
-          };
-
-          // Zamanlama hatasını (DOMException) önlemek için tampon
-          const now = ctx.currentTime + 0.05;
-          
-          // 1. Grup (Hızlı 3'lü)
-          playDing(now);        
-          playDing(now + 0.15); 
-          playDing(now + 0.30); 
-          
-          // Yarım saniye bekle -> 2. Grup (Hızlı 3'lü)
-          playDing(now + 0.80); 
-          playDing(now + 0.95); 
-          playDing(now + 1.10); 
-          
-          // Yarım saniye bekle -> 3. Grup (Hızlı 3'lü)
-          playDing(now + 1.60); 
-          playDing(now + 1.75); 
-          playDing(now + 1.90); 
+          // Masa siparişi için de Audio nesnesi kullanıyoruz, çünkü AudioContext bazı tarayıcılarda engellenebiliyor.
+          const audio = new Audio('https://cdn.pixabay.com/audio/2021/08/04/audio_0625c1539c.mp3');
+          audio.volume = 1.0;
+          audio.play().catch(e => console.log(e));
         }
       } catch (e) {}
     };
