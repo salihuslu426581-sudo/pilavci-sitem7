@@ -1,6 +1,10 @@
 export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 
+export async function GET() {
+  return NextResponse.json({ status: 'Aktif', message: 'Trendyol Webhook sistemi su an calisiyor. Beklemedeyiz.' });
+}
+
 // @ts-ignore
 if (!global.webhookOrders) {
   // @ts-ignore
