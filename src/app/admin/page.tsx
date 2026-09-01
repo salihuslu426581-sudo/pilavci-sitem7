@@ -127,35 +127,34 @@ export default function AdminDashboard() {
     sessionStorage.removeItem('pilavci_admin_auth');
   };
 
+  const playNotification = (table: string) => {
+    try {
+      let playCount = 0;
+      const playSound = () => {
+        if (playCount >= 3) return;
+        try {
+          const audio = new Audio('https://s3.amazonaws.com/freecodecamp/drums/Heater-1.mp3');
+          audio.volume = 1.0;
+          
+          audio.onended = () => {
+            playCount++;
+            if (playCount < 3) {
+              setTimeout(playSound, 500);
+            }
+          };
+
+          audio.play().catch(e => console.log(e));
+        } catch (e) {}
+      };
+      playSound();
+    } catch (e) {}
+  };
+
   useEffect(() => {
     const authStatus = sessionStorage.getItem('pilavci_admin_auth');
     if (authStatus === 'true') {
       setIsAuthenticated(true);
     }
-
-    const playNotification = (table: string) => {
-      try {
-        let playCount = 0;
-        const playSound = () => {
-          if (playCount >= 3) return;
-          try {
-            // %100 Çalışan küçük bir uyarı sesi (Data URI)
-            const audio = new Audio('https://s3.amazonaws.com/freecodecamp/drums/Heater-1.mp3');
-            audio.volume = 1.0;
-            
-            audio.onended = () => {
-              playCount++;
-              if (playCount < 3) {
-                setTimeout(playSound, 500);
-              }
-            };
-
-            audio.play().catch(e => console.log(e));
-          } catch (e) {}
-        };
-        playSound();
-      } catch (e) {}
-    };
 
     const loadOrders = async () => {
       try {
@@ -246,6 +245,22 @@ export default function AdminDashboard() {
         await fetch('/api/orders', { method: 'DELETE' }); // Optional, if we want to clear server side too
       } catch (e) {}
     }
+  };
+
+  const handleTestTrendyol = async () => {
+    try {
+      await fetch('/api/webhooks/trendyol', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderId: Math.floor(Math.random() * 10000),
+          totalPrice: 150,
+          lines: [{ productName: 'Test Pilav', quantity: 2 }]
+        })
+      });
+      // Test the sound directly just in case polling is slow
+      playNotification('Trendyol Yemek');
+    } catch (e) {}
   };
 
   const syncMenu = async (updatedMenu: MenuItem[]) => {
