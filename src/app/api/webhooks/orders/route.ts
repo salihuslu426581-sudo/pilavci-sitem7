@@ -1,19 +1,16 @@
 export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
+import { Redis } from '@upstash/redis';
 
-// In-memory queue for incoming external orders
-// In production, this would be a real database like PostgreSQL
-declare global {
-  var externalOrdersQueue: any[];
-}
-
-if (!global.externalOrdersQueue) {
-  global.externalOrdersQueue = [];
-}
+const redis = Redis.fromEnv();
 
 export async function GET() {
-  // Admin panel fetches pending external orders
-  return NextResponse.json({ orders: global.externalOrdersQueue });
+  try {
+    const orders = await redis.get('pilavci_external_orders') || [];
+    return NextResponse.json({ orders });
+  } catch (error) {
+    return NextResponse.json({ orders: [] });
+  }
 }
 
 export async function POST(request: Request) {
@@ -31,7 +28,9 @@ export async function POST(request: Request) {
       items: body.items || []
     };
 
-    global.externalOrdersQueue.push(newOrder);
+    const orders: any[] = (await redis.get('pilavci_external_orders')) || [];
+    orders.push(newOrder);
+    await redis.set('pilavci_external_orders', orders);
 
     return NextResponse.json({ success: true, message: 'Order received', orderId: newOrder.id });
   } catch (error) {
@@ -43,9 +42,9 @@ export async function DELETE(request: Request) {
   try {
     const { orderIds } = await request.json();
     if (Array.isArray(orderIds)) {
-      global.externalOrdersQueue = global.externalOrdersQueue.filter(
-        (order) => !orderIds.includes(order.id)
-      );
+      let orders: any[] = (await redis.get('pilavci_external_orders')) || [];
+      orders = orders.filter((order) => !orderIds.includes(order.id));
+      await redis.set('pilavci_external_orders', orders);
     }
     return NextResponse.json({ success: true });
   } catch (error) {

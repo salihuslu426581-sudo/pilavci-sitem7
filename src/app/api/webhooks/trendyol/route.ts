@@ -1,14 +1,11 @@
 export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
+import { Redis } from '@upstash/redis';
+
+const redis = Redis.fromEnv();
 
 export async function GET() {
   return NextResponse.json({ status: 'Aktif', message: 'Trendyol Webhook sistemi su an calisiyor. Beklemedeyiz.' });
-}
-
-// @ts-ignore
-if (!global.webhookOrders) {
-  // @ts-ignore
-  global.webhookOrders = [];
 }
 
 export async function POST(req: Request) {
@@ -30,10 +27,9 @@ export async function POST(req: Request) {
     };
 
     // Sistemi haberdar et (Admin panelindeki zil çalacak)
-    // @ts-ignore
-    if (!global.globalOrders) global.globalOrders = [];
-    // @ts-ignore
-    global.globalOrders.unshift(formattedOrder);
+    let orders: any[] = (await redis.get('pilavci_orders')) || [];
+    orders.unshift(formattedOrder);
+    await redis.set('pilavci_orders', orders);
 
     return NextResponse.json({ success: true, message: 'Trendyol siparişi başarıyla sisteme aktarıldı' });
   } catch (error) {

@@ -94,6 +94,23 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleTestTrendyolOrder = async () => {
+    try {
+      await fetch('/api/webhooks/trendyol', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderId: Math.floor(Math.random() * 10000),
+          totalPrice: 320,
+          lines: [{ productName: 'Trendyol Test Siparişi', quantity: 1 }]
+        })
+      });
+      alert('Test siparişi Trendyol API\'sinden başarıyla gönderildi. 5 saniye içinde sisteme düşecektir.');
+    } catch(e) {
+      alert('Sipariş gönderilirken hata oluştu');
+    }
+  };
+
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     if (password === 'PilavcıAdmin7M') {
@@ -364,6 +381,7 @@ export default function AdminDashboard() {
           <h1 className="brand-logo text-gold m-0" style={{ fontSize: '1.8rem', textAlign: 'left' }}>Admin Paneli</h1>
           <div className="flex gap-sm">
             <button onClick={handleTestOrder} className="btn-outline btn-sm hover:scale-105 transition-transform" style={{ background: 'var(--gold-primary)', color: '#000', borderColor: 'var(--gold-primary)', fontWeight: 'bold' }}>Test Et (Yemeksepeti)</button>
+            <button onClick={handleTestTrendyolOrder} className="btn-outline btn-sm hover:scale-105 transition-transform" style={{ background: '#f27a1a', color: '#fff', borderColor: '#f27a1a', fontWeight: 'bold' }}>Test Et (Trendyol)</button>
             <button onClick={handleLogout} className="btn-outline btn-sm" style={{ borderColor: '#ef4444', color: '#ef4444' }}>Çıkış Yap</button>
             <Link href="/" className="btn-outline btn-sm">Ana Sayfa</Link>
           </div>
