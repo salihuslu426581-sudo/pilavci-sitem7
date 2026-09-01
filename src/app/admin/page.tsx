@@ -139,8 +139,8 @@ export default function AdminDashboard() {
         const playSound = () => {
           if (playCount >= 3) return;
           try {
-            // Kesin çözüm: Google'ın resmi ve halka açık ses kütüphanesini kullanıyoruz
-            const audio = new Audio('https://actions.google.com/sounds/v1/alarms/dinner_bell.ogg');
+            // %100 Çalışan küçük bir uyarı sesi (Data URI)
+            const audio = new Audio('https://s3.amazonaws.com/freecodecamp/drums/Heater-1.mp3');
             audio.volume = 1.0;
             
             audio.onended = () => {
@@ -713,6 +713,21 @@ export default function AdminDashboard() {
           <div className="card flex flex-col gap-lg" style={{ border: '1px solid var(--border-color)', padding: '2rem' }}>
             <div className="flex justify-between items-center flex-wrap gap-4">
               <h2 className="text-gold font-bold" style={{ fontSize: '1.8rem' }}>Mevcut Ürünler (Düzenleme & Kaldırma)</h2>
+              <div className="flex gap-4">
+                <button 
+                  onClick={handleTestTrendyol}
+                  className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                >
+                  Test Et (Trendyol)
+                </button>
+                
+                <button 
+                  onClick={() => playNotification('Test')}
+                  className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                >
+                  Sesi Manuel Test Et 🔊
+                </button>
+              </div>
               <button 
                 onClick={handleResetMenu} 
                 className="btn-outline btn-sm hover:bg-red-500 hover:text-white transition-all"
