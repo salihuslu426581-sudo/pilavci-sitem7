@@ -19,7 +19,7 @@ export async function POST(req: Request) {
     // Trendyol API'den gelen karmaşık veri yapısını bizim sade sisteme (Admin panele) çeviriyoruz
     const formattedOrder = {
       id: '#TY' + (data.orderId || Math.floor(Math.random() * 10000)),
-      table: 'Paket / Trendyol',
+      table: 'Trendyol Yemek',
       time: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }),
       status: 'Yeni',
       total: data.totalPrice || 0,

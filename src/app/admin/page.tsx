@@ -30,7 +30,7 @@ const initialOrders = [
   },
   {
     id: '#1002',
-    table: 'Paket / Yemeksepeti',
+    table: 'Yemeksepeti',
     time: '14:15',
     status: 'Teslim Edildi',
     total: 600,
@@ -63,7 +63,7 @@ export default function AdminDashboard() {
   const audioCtxRef = useRef<any>(null);
 
   // Generate 20 tables + 1 Paket
-  const tables = Array.from({ length: 20 }, (_, i) => `Masa ${i + 1}`).concat(['Paket / Yemeksepeti']);
+  const tables = Array.from({ length: 20 }, (_, i) => `Masa ${i + 1}`).concat(['Yemeksepeti', 'Trendyol Yemek']);
 
   const updateStatus = async (id: string, newStatus: string) => {
     setOrders(orders.map(order => 
@@ -118,19 +118,25 @@ export default function AdminDashboard() {
 
     const playNotification = (table: string) => {
       try {
-        const isPaket = table.toLowerCase().includes('paket') || table.toLowerCase().includes('yemeksepeti');
-        
-        if (isPaket) {
-          // Bu MP3 senin bilgisayarında kesin çalışıyordu (Zırrr telefon sesi gibi)
-          const audio = new Audio('https://cdn.pixabay.com/audio/2021/08/04/audio_0625c1539c.mp3');
-          audio.volume = 1.0;
-          audio.play().catch(e => console.log(e));
-        } else {
-          // Masa siparişi için de Audio nesnesi kullanıyoruz, çünkü AudioContext bazı tarayıcılarda engellenebiliyor.
-          const audio = new Audio('https://cdn.pixabay.com/audio/2021/08/04/audio_0625c1539c.mp3');
-          audio.volume = 1.0;
-          audio.play().catch(e => console.log(e));
-        }
+        let playCount = 0;
+        const playSound = () => {
+          if (playCount >= 3) return;
+          try {
+            // "/sounds/table.mp3" zaten projende indirili duruyor (masa zili sesi)
+            const audio = new Audio('/sounds/table.mp3');
+            audio.volume = 1.0;
+            
+            audio.onended = () => {
+              playCount++;
+              if (playCount < 3) {
+                setTimeout(playSound, 500);
+              }
+            };
+
+            audio.play().catch(e => console.log(e));
+          } catch (e) {}
+        };
+        playSound();
       } catch (e) {}
     };
 
@@ -402,7 +408,8 @@ export default function AdminDashboard() {
         let totalRevenue = 0;
         
         orders.forEach(order => {
-          if (order.status === 'Tamamlandı') {
+          // Sistemdeki butonlarda statü "Teslim Edildi" olarak geçtiği için ciroya bunu dahil ediyoruz
+          if (order.status === 'Teslim Edildi') {
             totalRevenue += order.total;
           }
           
@@ -513,10 +520,10 @@ export default function AdminDashboard() {
               <span className={`font-bold ${hasOrder ? 'text-dark' : 'text-gold'}`} style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>
                 {table.replace('Masa ', '')}
               </span>
-              {table.includes('Paket') ? (
-                <span className="text-sm font-bold">Paket</span>
-              ) : (
+              {table.includes('Masa') ? (
                 <span className="text-xs">Masa</span>
+              ) : (
+                <span className="text-sm font-bold">Paket</span>
               )}
 
               {hasOrder && (

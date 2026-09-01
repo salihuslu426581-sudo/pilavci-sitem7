@@ -24,7 +24,7 @@ export async function POST(request: Request) {
     // Maps their structure to our internal schema
     const newOrder = {
       id: `#YS-${Math.floor(Math.random() * 9000) + 1000}`,
-      table: 'Paket / Yemeksepeti',
+      table: 'Yemeksepeti',
       time: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }),
       status: 'Yeni',
       total: body.total || 0,
