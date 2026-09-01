@@ -139,8 +139,8 @@ export default function AdminDashboard() {
         const playSound = () => {
           if (playCount >= 3) return;
           try {
-            // "/sounds/table.mp3" zaten projende indirili duruyor (masa zili sesi)
-            const audio = new Audio('/sounds/table.mp3');
+            // Güvence olması için doğrudan Github'daki ses dosyasını çekiyoruz
+            const audio = new Audio('https://raw.githubusercontent.com/salihuslu426581-sudo/pilavci-sitem7/main/public/sounds/table.mp3');
             audio.volume = 1.0;
             
             audio.onended = () => {
