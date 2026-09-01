@@ -139,8 +139,8 @@ export default function AdminDashboard() {
         const playSound = () => {
           if (playCount >= 3) return;
           try {
-            // Güvence olması için doğrudan Github'daki ses dosyasını çekiyoruz
-            const audio = new Audio('https://raw.githubusercontent.com/salihuslu426581-sudo/pilavci-sitem7/main/public/sounds/table.mp3');
+            // Kesin çözüm: Google'ın resmi ve halka açık ses kütüphanesini kullanıyoruz
+            const audio = new Audio('https://actions.google.com/sounds/v1/alarms/dinner_bell.ogg');
             audio.volume = 1.0;
             
             audio.onended = () => {
