@@ -129,24 +129,9 @@ export default function AdminDashboard() {
 
   const playNotification = (table: string) => {
     try {
-      let playCount = 0;
-      const playSound = () => {
-        if (playCount >= 3) return;
-        try {
-          const audio = new Audio('https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg');
-          audio.volume = 1.0;
-          
-          audio.onended = () => {
-            playCount++;
-            if (playCount < 3) {
-              setTimeout(playSound, 500);
-            }
-          };
-
-          audio.play().catch(e => console.log(e));
-        } catch (e) {}
-      };
-      playSound();
+      const audio = new Audio('/sounds/siparis.mp3.mp3');
+      audio.volume = 1.0;
+      audio.play().catch(e => console.log('Ses çalma hatası:', e));
     } catch (e) {}
   };
 
