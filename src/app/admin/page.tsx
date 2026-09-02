@@ -129,9 +129,24 @@ export default function AdminDashboard() {
 
   const playNotification = (table: string) => {
     try {
-      const audio = new Audio('/sounds/siparis.mp3.mp3');
-      audio.volume = 1.0;
-      audio.play().catch(e => console.log('Ses çalma hatası:', e));
+      let playCount = 0;
+      const playSound = () => {
+        if (playCount >= 3) return;
+        try {
+          const audio = new Audio('/sounds/siparis.mp3.mp3');
+          audio.volume = 1.0;
+          
+          audio.onended = () => {
+            playCount++;
+            if (playCount < 3) {
+              setTimeout(playSound, 500);
+            }
+          };
+
+          audio.play().catch(e => console.log('Ses çalma hatası:', e));
+        } catch (e) {}
+      };
+      playSound();
     } catch (e) {}
   };
 
