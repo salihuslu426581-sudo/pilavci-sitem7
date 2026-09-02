@@ -133,7 +133,7 @@ export default function AdminDashboard() {
       const playSound = () => {
         if (playCount >= 3) return;
         try {
-          const audio = new Audio('https://s3.amazonaws.com/freecodecamp/drums/Heater-1.mp3');
+          const audio = new Audio('https://cdn.pixabay.com/download/audio/2022/03/15/audio_248c775080.mp3');
           audio.volume = 1.0;
           
           audio.onended = () => {
