@@ -441,18 +441,18 @@ export default function AdminDashboard() {
         let totalRevenue = 0;
         
         orders.forEach(order => {
-          // Sistemdeki butonlarda statü "Teslim Edildi" olarak geçtiği için ciroya bunu dahil ediyoruz
+          // Sadece Teslim Edildi durumundaki siparişleri ciro ve raporlamaya dahil ediyoruz
           if (order.status === 'Teslim Edildi') {
-            totalRevenue += order.total;
+            totalRevenue += Number(order.total) || 0;
+            
+            order.items.forEach(item => {
+              const key = item.option ? `${item.name} (${item.option})` : item.name;
+              if (!salesData[key]) {
+                salesData[key] = { qty: 0 };
+              }
+              salesData[key].qty += Number(item.qty) || 1;
+            });
           }
-          
-          order.items.forEach(item => {
-            const key = item.option ? `${item.name} (${item.option})` : item.name;
-            if (!salesData[key]) {
-              salesData[key] = { qty: 0 };
-            }
-            salesData[key].qty += item.qty;
-          });
         });
 
         const sortedSales = Object.entries(salesData).sort((a, b) => b[1].qty - a[1].qty);

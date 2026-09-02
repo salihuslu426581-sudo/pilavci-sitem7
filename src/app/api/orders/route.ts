@@ -47,13 +47,19 @@ export async function PUT(request: Request) {
 
 export async function DELETE(request: Request) {
   try {
-    const { table } = await request.json();
-    let orders: any[] = (await redis.get('pilavci_orders')) || [];
+    const text = await request.text();
+    const body = text ? JSON.parse(text) : {};
     
-    // Remove all orders for a specific table
-    orders = orders.filter((order) => order.table !== table);
+    if (body.table) {
+      let orders: any[] = (await redis.get('pilavci_orders')) || [];
+      // Remove all orders for a specific table
+      orders = orders.filter((order) => order.table !== body.table);
+      await redis.set('pilavci_orders', orders);
+    } else {
+      // Clear all orders (Gün Sonu)
+      await redis.set('pilavci_orders', []);
+    }
     
-    await redis.set('pilavci_orders', orders);
     return NextResponse.json({ success: true });
   } catch (error) {
     return NextResponse.json({ success: false }, { status: 400 });
