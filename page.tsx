@@ -467,19 +467,7 @@ export default function AdminDashboard() {
                 <h2 className="text-gold font-bold text-center" style={{ fontSize: '1.8rem', marginBottom: '0.5rem' }}>Özel QR Kodlar & Masalar</h2>
                 <p className="text-muted text-center mb-4">Aşağıdaki QR kodları telefonunuzla veya yazıcıyla kolayca alıp masalara ve afişlere yerleştirebilirsiniz. (Süresi asla dolmaz!)</p>
                 
-                {/* Sosyal Medya QR */}
-                <div className="flex flex-col items-center gap-sm p-4 rounded mb-6 mx-auto" style={{ background: 'var(--bg-darker)', border: '2px solid var(--gold-primary)', maxWidth: '280px' }}>
-                  <h3 className="text-gold font-bold text-center" style={{ fontSize: '1.2rem' }}>📱 Sosyal Medya (Linkler)</h3>
-                  <p className="text-xs text-muted text-center mb-2">Afişteki sol üst kısım için</p>
-                  <div style={{ background: '#fff', padding: '10px', borderRadius: '8px' }}>
-                    <img src={linklerQrUrl} alt="Sosyal Medya QR Kod" style={{ width: '200px', height: '200px', objectFit: 'contain' }} />
-                  </div>
-                  <a href={linklerQrUrl} target="_blank" download className="btn-primary w-full text-center mt-2" style={{ padding: '8px 0', fontSize: '0.9rem' }}>
-                    Yüksek Kalitede İndir (Sticker)
-                  </a>
-                </div>
-
-                <h3 className="text-gold font-bold mt-4 mb-2 border-t pt-6" style={{ borderColor: 'var(--border-color)', fontSize: '1.4rem' }}>Masa QR Kodları</h3>
+                <h3 className="text-gold font-bold mt-2 mb-2" style={{ fontSize: '1.4rem' }}>Masa QR Kodları</h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-xl">
                   {Array.from({ length: 10 }, (_, i) => i + 1).map(num => {
                     const tableUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/menu?table=Masa ${num}`;
@@ -497,6 +485,19 @@ export default function AdminDashboard() {
                       </div>
                     );
                   })}
+                </div>
+
+                <h3 className="text-gold font-bold mt-8 mb-4 border-t pt-6 text-center" style={{ borderColor: 'var(--border-color)', fontSize: '1.6rem' }}>Sosyal Medya QR Kodu</h3>
+                {/* Sosyal Medya QR */}
+                <div className="flex flex-col items-center gap-sm p-4 rounded mb-6 mx-auto" style={{ background: 'var(--bg-darker)', border: '2px solid var(--gold-primary)', maxWidth: '280px' }}>
+                  <h3 className="text-gold font-bold text-center" style={{ fontSize: '1.2rem' }}>📱 Sosyal Medya (Linkler)</h3>
+                  <p className="text-xs text-muted text-center mb-2">Afişteki sol üst kısım için</p>
+                  <div style={{ background: '#fff', padding: '10px', borderRadius: '8px' }}>
+                    <img src={linklerQrUrl} alt="Sosyal Medya QR Kod" style={{ width: '200px', height: '200px', objectFit: 'contain' }} />
+                  </div>
+                  <a href={linklerQrUrl} target="_blank" download className="btn-primary w-full text-center mt-2" style={{ padding: '8px 0', fontSize: '0.9rem' }}>
+                    Yüksek Kalitede İndir (Sticker)
+                  </a>
                 </div>
               </div>
             </div>
