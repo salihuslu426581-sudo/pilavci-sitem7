@@ -94,6 +94,23 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleTestTrendyolOrder = async () => {
+    try {
+      await fetch('/api/webhooks/trendyol', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderId: Math.floor(Math.random() * 10000),
+          totalPrice: 320,
+          lines: [{ productName: 'Trendyol Test Siparişi', quantity: 1 }]
+        })
+      });
+      alert('Test siparişi Trendyol API\'sinden başarıyla gönderildi. 5 saniye içinde sisteme düşecektir.');
+    } catch(e) {
+      alert('Sipariş gönderilirken hata oluştu');
+    }
+  };
+
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     if (password === 'PilavcıAdmin7M') {
@@ -110,35 +127,34 @@ export default function AdminDashboard() {
     sessionStorage.removeItem('pilavci_admin_auth');
   };
 
+  const playNotification = (table: string) => {
+    try {
+      let playCount = 0;
+      const playSound = () => {
+        if (playCount >= 3) return;
+        try {
+          const audio = new Audio('/sounds/siparis.mp3.mp3');
+          audio.volume = 1.0;
+          
+          audio.onended = () => {
+            playCount++;
+            if (playCount < 3) {
+              setTimeout(playSound, 500);
+            }
+          };
+
+          audio.play().catch(e => console.log('Ses çalma hatası:', e));
+        } catch (e) {}
+      };
+      playSound();
+    } catch (e) {}
+  };
+
   useEffect(() => {
     const authStatus = sessionStorage.getItem('pilavci_admin_auth');
     if (authStatus === 'true') {
       setIsAuthenticated(true);
     }
-
-    const playNotification = (table: string) => {
-      try {
-        let playCount = 0;
-        const playSound = () => {
-          if (playCount >= 3) return;
-          try {
-            // "/sounds/table.mp3" zaten projende indirili duruyor (masa zili sesi)
-            const audio = new Audio('/sounds/table.mp3');
-            audio.volume = 1.0;
-            
-            audio.onended = () => {
-              playCount++;
-              if (playCount < 3) {
-                setTimeout(playSound, 500);
-              }
-            };
-
-            audio.play().catch(e => console.log(e));
-          } catch (e) {}
-        };
-        playSound();
-      } catch (e) {}
-    };
 
     const loadOrders = async () => {
       try {
@@ -229,6 +245,22 @@ export default function AdminDashboard() {
         await fetch('/api/orders', { method: 'DELETE' }); // Optional, if we want to clear server side too
       } catch (e) {}
     }
+  };
+
+  const handleTestTrendyol = async () => {
+    try {
+      await fetch('/api/webhooks/trendyol', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderId: Math.floor(Math.random() * 10000),
+          totalPrice: 150,
+          lines: [{ productName: 'Test Pilav', quantity: 2 }]
+        })
+      });
+      // Test the sound directly just in case polling is slow
+      playNotification('Trendyol Yemek');
+    } catch (e) {}
   };
 
   const syncMenu = async (updatedMenu: MenuItem[]) => {
@@ -364,6 +396,7 @@ export default function AdminDashboard() {
           <h1 className="brand-logo text-gold m-0" style={{ fontSize: '1.8rem', textAlign: 'left' }}>Admin Paneli</h1>
           <div className="flex gap-sm">
             <button onClick={handleTestOrder} className="btn-outline btn-sm hover:scale-105 transition-transform" style={{ background: 'var(--gold-primary)', color: '#000', borderColor: 'var(--gold-primary)', fontWeight: 'bold' }}>Test Et (Yemeksepeti)</button>
+            <button onClick={handleTestTrendyolOrder} className="btn-outline btn-sm hover:scale-105 transition-transform" style={{ background: '#f27a1a', color: '#fff', borderColor: '#f27a1a', fontWeight: 'bold' }}>Test Et (Trendyol)</button>
             <button onClick={handleLogout} className="btn-outline btn-sm" style={{ borderColor: '#ef4444', color: '#ef4444' }}>Çıkış Yap</button>
             <Link href="/" className="btn-outline btn-sm">Ana Sayfa</Link>
           </div>
@@ -408,29 +441,45 @@ export default function AdminDashboard() {
         let totalRevenue = 0;
         
         orders.forEach(order => {
-          // Sistemdeki butonlarda statü "Teslim Edildi" olarak geçtiği için ciroya bunu dahil ediyoruz
+          // Sadece Teslim Edildi durumundaki siparişleri ciro ve raporlamaya dahil ediyoruz
           if (order.status === 'Teslim Edildi') {
-            totalRevenue += order.total;
+            totalRevenue += Number(order.total) || 0;
+            
+            order.items.forEach(item => {
+              const key = item.option ? `${item.name} (${item.option})` : item.name;
+              if (!salesData[key]) {
+                salesData[key] = { qty: 0 };
+              }
+              salesData[key].qty += Number(item.qty) || 1;
+            });
           }
-          
-          order.items.forEach(item => {
-            const key = item.option ? `${item.name} (${item.option})` : item.name;
-            if (!salesData[key]) {
-              salesData[key] = { qty: 0 };
-            }
-            salesData[key].qty += item.qty;
-          });
         });
 
         const sortedSales = Object.entries(salesData).sort((a, b) => b[1].qty - a[1].qty);
 
         if (activeTab === 'qr') {
+          const linklerUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/linkler`;
+          const linklerQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${encodeURIComponent(linklerUrl)}`;
+
           return (
             <div className="flex flex-col gap-lg mx-auto w-full max-w-[900px]">
               <div className="card flex flex-col gap-md" style={{ border: '1px solid var(--border-color)', padding: '2rem' }}>
-                <h2 className="text-gold font-bold text-center" style={{ fontSize: '1.8rem', marginBottom: '1rem' }}>Masa QR Kodları</h2>
-                <p className="text-muted text-center mb-4">Aşağıdaki QR kodları telefonunuzla veya yazıcıyla kolayca alıp masalara yerleştirebilirsiniz.</p>
+                <h2 className="text-gold font-bold text-center" style={{ fontSize: '1.8rem', marginBottom: '0.5rem' }}>Özel QR Kodlar & Masalar</h2>
+                <p className="text-muted text-center mb-4">Aşağıdaki QR kodları telefonunuzla veya yazıcıyla kolayca alıp masalara ve afişlere yerleştirebilirsiniz. (Süresi asla dolmaz!)</p>
                 
+                {/* Sosyal Medya QR */}
+                <div className="flex flex-col items-center gap-sm p-4 rounded mb-6 mx-auto" style={{ background: 'var(--bg-darker)', border: '2px solid var(--gold-primary)', maxWidth: '280px' }}>
+                  <h3 className="text-gold font-bold text-center" style={{ fontSize: '1.2rem' }}>📱 Sosyal Medya (Linkler)</h3>
+                  <p className="text-xs text-muted text-center mb-2">Afişteki sol üst kısım için</p>
+                  <div style={{ background: '#fff', padding: '10px', borderRadius: '8px' }}>
+                    <img src={linklerQrUrl} alt="Sosyal Medya QR Kod" style={{ width: '200px', height: '200px', objectFit: 'contain' }} />
+                  </div>
+                  <a href={linklerQrUrl} target="_blank" download className="btn-primary w-full text-center mt-2" style={{ padding: '8px 0', fontSize: '0.9rem' }}>
+                    Yüksek Kalitede İndir (Sticker)
+                  </a>
+                </div>
+
+                <h3 className="text-gold font-bold mt-4 mb-2 border-t pt-6" style={{ borderColor: 'var(--border-color)', fontSize: '1.4rem' }}>Masa QR Kodları</h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-xl">
                   {Array.from({ length: 10 }, (_, i) => i + 1).map(num => {
                     const tableUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/menu?table=Masa ${num}`;
@@ -695,6 +744,21 @@ export default function AdminDashboard() {
           <div className="card flex flex-col gap-lg" style={{ border: '1px solid var(--border-color)', padding: '2rem' }}>
             <div className="flex justify-between items-center flex-wrap gap-4">
               <h2 className="text-gold font-bold" style={{ fontSize: '1.8rem' }}>Mevcut Ürünler (Düzenleme & Kaldırma)</h2>
+              <div className="flex gap-4">
+                <button 
+                  onClick={handleTestTrendyol}
+                  className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                >
+                  Test Et (Trendyol)
+                </button>
+                
+                <button 
+                  onClick={() => playNotification('Test')}
+                  className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                >
+                  Sesi Manuel Test Et 🔊
+                </button>
+              </div>
               <button 
                 onClick={handleResetMenu} 
                 className="btn-outline btn-sm hover:bg-red-500 hover:text-white transition-all"
@@ -788,3 +852,4 @@ export default function AdminDashboard() {
     </div>
   );
 }
+
